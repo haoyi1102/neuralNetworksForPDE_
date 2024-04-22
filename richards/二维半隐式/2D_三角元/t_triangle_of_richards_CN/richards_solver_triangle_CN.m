@@ -1,0 +1,28 @@
+function result=richards_solver_triangle_CN(result1_1,result1_2,j,dt,N1_partition,N2_partition,N1_basis,N2_basis,M_partition,T_partition,M_basis,T_basis,Gauss_coefficient_reference_triangle,Gauss_point_reference_triangle,number_of_elements,matrix_size,vector_size,number_of_trial_local_basis,number_of_test_local_basis)
+
+A1=assemble_matrix_from_A1_integral_triangle_left(result1_2,j,dt,M_partition,T_partition,T_basis,T_basis,number_of_trial_local_basis,number_of_test_local_basis,number_of_elements,matrix_size,Gauss_coefficient_reference_triangle,Gauss_point_reference_triangle,0,0,0,0);
+A21=assemble_matrix_from_A2_integral_triangle_left(result1_2,j,M_partition,T_partition,T_basis,T_basis,number_of_trial_local_basis,number_of_test_local_basis,number_of_elements,matrix_size,Gauss_coefficient_reference_triangle,Gauss_point_reference_triangle,1,0,1,0);
+A22=assemble_matrix_from_A2_integral_triangle_left(result1_2,j,M_partition,T_partition,T_basis,T_basis,number_of_trial_local_basis,number_of_test_local_basis,number_of_elements,matrix_size,Gauss_coefficient_reference_triangle,Gauss_point_reference_triangle,0,1,0,1);
+A3=assemble_matrix_from_A3_integral_triangle_left(result1_2,j,M_partition,T_partition,T_basis,T_basis,number_of_trial_local_basis,number_of_test_local_basis,number_of_elements,matrix_size,Gauss_coefficient_reference_triangle,Gauss_point_reference_triangle,0,1,0,0);
+A=A1+(A21+A22)-A3;
+clear A1 A21 A22 A3
+
+b1=assemble_vector_from_b1_integral_triangle_right(result1_1,result1_2,j,dt,M_partition,T_partition,T_basis,number_of_test_local_basis,number_of_elements,vector_size,Gauss_coefficient_reference_triangle,Gauss_point_reference_triangle,0,0);
+b21=assemble_vector_from_b2_integral_triangle_right(result1_1,result1_2,j,M_partition,T_partition,T_basis,number_of_test_local_basis,number_of_elements,vector_size,Gauss_coefficient_reference_triangle,Gauss_point_reference_triangle,1,0);
+b22=assemble_vector_from_b2_integral_triangle_right(result1_1,result1_2,j,M_partition,T_partition,T_basis,number_of_test_local_basis,number_of_elements,vector_size,Gauss_coefficient_reference_triangle,Gauss_point_reference_triangle,0,1);
+b3=assemble_vector_from_b3_integral_triangle_right(result1_1,result1_2,j,M_partition,T_partition,T_basis,number_of_test_local_basis,number_of_elements,vector_size,Gauss_coefficient_reference_triangle,Gauss_point_reference_triangle,0,0);
+
+b=b1-(b21+b22)+b3;
+clear b1 b21 b22 b3
+
+[boundary_nodes,~]=generate_boundary_nodes_edges(N1_basis,N2_basis,N1_partition,N2_partition);
+
+[A,b]=treat_Dirichlet_boundary_triangle('function_boundary',A,b,boundary_nodes,M_basis);
+
+result=A\b;
+
+
+
+
+
+
